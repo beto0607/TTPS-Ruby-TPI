@@ -15,3 +15,4 @@ Solution implemented for [this assignment](https://github.com/TTPS-ruby/practica
 ### Dependencies ###
 * Ruby 2.5
 * Rails 5.2
+* Database_cleanner
