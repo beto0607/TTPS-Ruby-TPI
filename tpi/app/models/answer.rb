@@ -10,10 +10,10 @@ class Answer < ApplicationRecord
   after_validation do |answer|
     #testing propurse
     if(Question.find_by(id:answer.question_id))then
-      if(Question.find_by(id:answer.question_id).status)then
+      if(Question.find_by(id:answer.question_id).status == true)then
         raise QuestionSolved
       end
-      if(Question.find_by(id:answer.question_id).answer_id == answer.id)then
+      if(answer.id != nil && Question.find_by(id:answer.question_id).answer_id == answer.id)then
         raise AnswerSolution
       end
     end

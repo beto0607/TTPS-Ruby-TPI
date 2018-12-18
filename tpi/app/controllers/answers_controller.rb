@@ -49,8 +49,30 @@ class AnswersController < ApplicationController
         begin
             checkContentType
             logged_user = getUserByToken
-            Question.find_by!(id: params[:question_id])
+            a = Question.find_by!(id: params[:question_id])
                 .answers.create!(content: params[:content], user_id: logged_user.id)
+            render json: {
+                data: {
+                    type: 'answer',
+                    id: a.id,
+                    attributes: {
+                        content: a.content,
+                        created_at: a.created_at,
+                        updated_at: a.updated_at
+                    },
+                    relationships: {
+                        author: {
+                            id: a.user_id
+                        },
+                        question:{
+                            id: a.question_id,
+                            links:{
+                                self: (request || req).base_url+"/questions/#{a.question_id}"
+                            }
+                        }
+                    }
+                }
+            }, status: 200
         rescue ActiveRecord::RecordNotFound
             renderError $!.message, 404
         rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError, QuestionSolved, MimeTypeError

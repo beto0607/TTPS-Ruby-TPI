@@ -37,7 +37,7 @@ class AnswerSolution < StandardError
         409
     end
     def message
-        "Question solver by this answer. Cannot be deleted."
+        "Question solved by this answer. Cannot be deleted."
     end
 end
 class MimeTypeError < StandardError

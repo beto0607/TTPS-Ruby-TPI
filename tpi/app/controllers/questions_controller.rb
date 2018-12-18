@@ -99,7 +99,8 @@ class QuestionsController < ApplicationController
             logged_user = getUserByToken
             question = logged_user.questions.create!(
                 title: params[:title],
-                description: params[:description]
+                description: params[:description],
+                status: false
             )
             render json: show(question.id), status: :created
         rescue ActiveRecord::RecordNotFound
@@ -141,7 +142,7 @@ class QuestionsController < ApplicationController
             question = Question.find_by!(id: params[:id])
             if(logged_user.id != question.user_id)then raise OwnerError end
             question.destroy!
-            render json: show(question.id), status: :no_content
+            render json: {}, status: :no_content
         rescue ActiveRecord::RecordNotDestroyed
             renderError $!.message, 409
         rescue ActiveRecord::RecordNotFound
@@ -150,6 +151,8 @@ class QuestionsController < ApplicationController
             renderError $!.message, 400
         rescue OwnerError, TokenDoesntExist
             renderError $!.message, $!.httpResponse
+        rescue ActiveRecord::DeleteRestrictionError
+            renderError "Question has answers", 400
         rescue
             renderError $!.message, 500
         end
