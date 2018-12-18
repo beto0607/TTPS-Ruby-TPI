@@ -8,11 +8,14 @@ class Answer < ApplicationRecord
   validates :content, :user_id, presence: true
 
   after_validation do |answer|
-    if(Question.find_by(id:answer.question_id).status)then
-      raise QuestionSolved
-    end
-    if(Question.find_by(id:answer.question_id).answer_id == answer.id)then
-      raise AnswerSolution
+    #testing propurse
+    if(Question.find_by(id:answer.question_id))then
+      if(Question.find_by(id:answer.question_id).status)then
+        raise QuestionSolved
+      end
+      if(Question.find_by(id:answer.question_id).answer_id == answer.id)then
+        raise AnswerSolution
+      end
     end
   end
 end

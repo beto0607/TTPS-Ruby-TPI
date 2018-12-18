@@ -95,6 +95,7 @@ class QuestionsController < ApplicationController
 
     def new
         begin
+            checkContentType
             logged_user = getUserByToken
             question = logged_user.questions.create!(
                 title: params[:title],
@@ -105,7 +106,7 @@ class QuestionsController < ApplicationController
             renderError $!.message, 404
         rescue ActiveRecord::RecordInvalid
             renderError $!.message, 400
-        rescue TokenDoesntExist
+        rescue TokenDoesntExist, MimeTypeError
             renderError $!.message, $!.httpResponse
         rescue
             renderError $!.message, 500
@@ -114,6 +115,7 @@ class QuestionsController < ApplicationController
 
     def edit
         begin
+            checkContentType
             logged_user = getUserByToken
             question = Question.find_by!(id: params[:id])
             if(logged_user.id != question.user_id)then raise OwnerError end
@@ -126,7 +128,7 @@ class QuestionsController < ApplicationController
             renderError $!.message, 404
         rescue ActiveRecord::RecordInvalid
             renderError $!.message, 400
-        rescue OwnerError, TokenDoesntExist
+        rescue OwnerError, TokenDoesntExist, MimeTypeError
             renderError $!.message, $!.httpResponse
         rescue
             renderError $!.message, 500
@@ -155,6 +157,7 @@ class QuestionsController < ApplicationController
 
     def update
         begin
+            checkContentType
             logged_user = getUserByToken
             question = Question.find_by!(id: params[:id])
             if(logged_user.id != question.user_id)then raise OwnerError end
@@ -165,7 +168,7 @@ class QuestionsController < ApplicationController
             render json: show(question.id), status: :no_content
         rescue ActiveRecord::RecordNotFound
             renderError $!.message, 404
-        rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError
+        rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError, MimeTypeError
             renderError $!.message, $!.httpResponse
         rescue
             renderError $!.message, 500

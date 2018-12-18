@@ -40,8 +40,20 @@ class AnswerSolution < StandardError
         "Question solver by this answer. Cannot be deleted."
     end
 end
+class MimeTypeError < StandardError
+    def httpResponse
+        406
+    end
+    def message
+        "Mime type error"
+    end
+end
 
 class ApplicationController < ActionController::API
+
+    def checkContentType
+        raise MimeTypeError unless (request.content_type == "application/vnd.api+json" || request.content_type == "application/json")
+    end
 
     def renderJSON (object, status=:ok)
         render json: object, status: status

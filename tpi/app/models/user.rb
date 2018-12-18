@@ -6,7 +6,7 @@ class User < ApplicationRecord
     has_many :tokens
 
     validates :username, uniqueness: true, presence: true
-    validates :email, uniqueness: true, presence: true
+    validates :email, uniqueness: true, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP } 
     validates :password, presence: true
     validates :screen_name, presence: true
 

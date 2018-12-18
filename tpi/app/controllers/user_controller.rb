@@ -1,6 +1,7 @@
 class UserController < ApplicationController
     def new
         begin
+            checkContentType
             new_user = User.new do |u|
                 u.username = params[:username]
                 u.password = User.encryptedPassword(params[:password])
@@ -14,21 +15,18 @@ class UserController < ApplicationController
                     id: new_user.id,
                     attributes: User.userAttributes(new_user)
                 }
-            }, :created)
+            }, 201)
         rescue ActiveRecord::RecordInvalid
-            render json: {
-                errors: [{
-                    status: 409,
-                    title: "Record invalid",
-                    detail: $!.message
-                }]
-            }, status: :conflict
+            renderError "Record invalid", 409
+        rescue MimeTypeError
+            renderError $!.message, $!.httpResponse
         end
     end
 
     def login
         begin
-            logged_user = User.find_by(username: params[:username], password: User.encryptedPassword(params[:password]))
+            checkContentType
+            logged_user = User.find_by!(username: params[:username], password: User.encryptedPassword(params[:password]))
             logged_user.tokens.where(["expire_at < ?", DateTime.now]).destroy_all
             tokens = logged_user.tokens.where(["expire_at > ?", DateTime.now]).order("expire_at DESC")
             if(tokens.length > 0)then
@@ -37,7 +35,6 @@ class UserController < ApplicationController
             else
                 t = logged_user.tokens.create(token: Token.createToken, expire_at: Token.nextExpireDateTime)
             end
-            
             renderJSON({
                 :data => {
                     type: "user",
@@ -46,13 +43,9 @@ class UserController < ApplicationController
                 }
             }, :ok)
         rescue ActiveRecord::RecordNotFound
-            render json: {
-                errors: [{
-                    status: 404,
-                    title: "User not found",
-                    detail: $!.message
-                }]
-            }, status: :conflict
+            renderError "User not found", 404
+        rescue MimeTypeError
+            renderError $!.message, $!.httpResponse
         end
     end
 end

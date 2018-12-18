@@ -1,7 +1,7 @@
 require 'test_helper'
 
-class TokenTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+class TokensTest < ActiveSupport::TestCase
+  test "Cannot be created without a date or token" do
+    assert_not Token.new.valid?
+  end
 end

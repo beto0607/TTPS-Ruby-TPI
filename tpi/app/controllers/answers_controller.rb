@@ -47,12 +47,13 @@ class AnswersController < ApplicationController
 
     def new
         begin
+            checkContentType
             logged_user = getUserByToken
             Question.find_by!(id: params[:question_id])
                 .answers.create!(content: params[:content], user_id: logged_user.id)
         rescue ActiveRecord::RecordNotFound
             renderError $!.message, 404
-        rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError, QuestionSolved
+        rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError, QuestionSolved, MimeTypeError
             renderError $!.message, $!.httpResponse
         rescue
             renderError $!.message, 500
