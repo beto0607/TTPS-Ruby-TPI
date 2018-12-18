@@ -22,4 +22,9 @@ u_a.save
 (u_q.questions.create(title: "Pregunta 1", description: "Descripción de la pregunta 1")).save
 
 
+(u_q.questions.create(title: "Pregunta 3", description: "Descripción de la pregunta 3")).save
+
+
 u_a.answers.create(question_id: 1, content: "Respuesta 1").save
+
+(u_q.questions.create(title: "Pregunta 2", description: "Descripción de la pregunta 2", status: true, answer_id: 1)).save
