@@ -13,6 +13,13 @@ class User < ApplicationRecord
     before_save   :downcase_email
 
 
+    def to_token_payload
+        # Returns the payload as a hash
+        p headers['X-QA-Key']
+        headers['X-QA-Key']
+
+    end
+
     private
     def downcase_email
         self.email.downcase!

@@ -11,3 +11,7 @@
 
 ## Owner ##
 * Albanesi, Roberto. Legajo: 09761/0
+
+## Endpoints ##
+
+[Endpoints file](ENDPOINTS.md)
