@@ -57,3 +57,4 @@ gem 'knock'
 
 # For serialize objects to JSON: Active Model Serializers
 gem 'active_model_serializers', '~> 0.10.0'
+gem "jsonapi-resources", "~> 0.9.5"

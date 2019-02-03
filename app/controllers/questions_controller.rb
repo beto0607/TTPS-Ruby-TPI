@@ -4,13 +4,26 @@ class QuestionsController < ApplicationController
 
   # GET /questions
   def index
-    @questions = Question.all
+    if(params[:sort] == "needing_help")then
+      questions = Question.where(status: false).limit(Question.pageSize).sort do |a,b|
+        a.answers.count  <=> b.answers.count
+      end
+    else
+      questions = Question.all.limit(Question.pageSize)
+        .order((params[:sort] == "pending_first" ? 'status ASC,':'')+'created_at DESC')
+    end
 
-    render json: @questions
+    render json: JSONAPI::ResourceSerializer.new(QuestionResource, 
+    fields:{
+      questions: [:title, :user_id, :answer_count, :status, :answer_id, :description_short, :created_at, :updated_at],
+      links: [:self]
+    }).serialize_to_hash(
+      questions.map {|q| QuestionResource.new(q, nil)}
+    )
   end
 
   # GET /questions/1
-  def show
+  def show2
     render json: @question
   end
 

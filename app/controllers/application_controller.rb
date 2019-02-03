@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::API
     include Knock::Authenticable
+    include JSONAPI::ActsAsResourceController
 
 
     def token_from_request_headers
