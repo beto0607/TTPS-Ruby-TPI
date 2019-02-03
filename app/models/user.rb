@@ -10,16 +10,16 @@ class User < ApplicationRecord
     validates :password_digest, presence: true
     validates :screen_name, presence: true
 
-    before_save   :downcase_email
+    before_save :downcase_email
 
 
-    def to_token_payload
-        # Returns the payload as a hash
-        p headers['X-QA-Key']
-        headers['X-QA-Key']
 
+    def self.from_token_request request
+        username = request.params["auth"] && request.params["auth"]["username"]
+        self.find_by username: username
     end
 
+    
     private
     def downcase_email
         self.email.downcase!

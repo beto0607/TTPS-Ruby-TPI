@@ -1,6 +1,6 @@
 class QuestionsController < ApplicationController
-  before_action :authenticate_user, only: [:create, :update, :destroy]
   before_action :set_question, only: [:show, :update, :destroy]
+  before_action :authenticate_user, only: [:create, :update, :destroy]
 
   # GET /questions
   def index
@@ -50,6 +50,6 @@ class QuestionsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def question_params
-      params.require(:question).permit(:title, :description, :status, :User_id)
+      params.require(:question).permit(:title, :description, :status, :user_id)
     end
 end
