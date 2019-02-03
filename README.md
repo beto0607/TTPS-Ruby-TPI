@@ -15,3 +15,10 @@
 ## Endpoints ##
 
 [Endpoints file](ENDPOINTS.md)
+
+
+## Usage ##
+
+1. `rails db:create`
+2. `rails db:seed`
+3. `rails s`

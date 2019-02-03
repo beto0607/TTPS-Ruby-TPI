@@ -6,6 +6,12 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
+testUser = User.new
+testUser.username = "UserTest"
+testUser.email = Faker::Internet.email
+testUser.screen_name = Faker::Artist.name
+testUser.password = testUser.password_confirmation = "Test1"
+testUser.save
 
 user1 = User.new
 user1.username = Faker::Internet.username
