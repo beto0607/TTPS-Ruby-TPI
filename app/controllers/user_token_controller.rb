@@ -6,10 +6,9 @@ class UserTokenController < Knock::AuthTokenController
     def auth_params
         params.require(:auth).permit :username, :password
     end
-    
-    def auth_token2
-        p entity.id
-        Knock::AuthToken.new payload: {"user":"#{entity.id}"}
+
+    def to_json options = {}
+        p "to_json UserTokenController"
+        {token: @token}.to_json
     end
-  
 end

@@ -59,5 +59,15 @@ Knock.setup do |config|
 
   config.token_secret_signature_key = -> { Rails.application.credentials.read }
 
+  module Knock::Authenticable
+    def token_from_request_headers
+      p "token_from_request_headers custom"
+      unless request.headers['X-QA-Key'].nil?
+        request.headers['X-QA-Key'].split.last
+      end
+    end
+  end
+  
+
 
 end
