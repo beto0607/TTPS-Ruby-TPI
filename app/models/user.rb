@@ -5,6 +5,8 @@ class User < ApplicationRecord
 
     has_many :answers
 
+    validates :questions, presence: false
+    validates :answers, presence: false
     validates :username, uniqueness: true, presence: true
     validates :email, uniqueness: { case_sensitive: false }, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP } 
     validates :password_digest, presence: true
