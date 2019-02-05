@@ -1,41 +1,45 @@
 class AnswersController < ApplicationController
   before_action :set_answer, only: [:show, :update, :destroy]
+  before_action :set_question, only: [:index, :create, :destroy]
+  before_action :authenticate_user, only: [:create, :destroy]
+  before_action :check_if_solved, only: [:create]
+  before_action :check_if_owner, only: [:destroy]
 
-  # GET /answers
+
+  # GET /questions/:question_id/answers
   def index
-    @answers = Answer.all
-
-    render json: @answers
+    render json: JSONAPI::ResourceSerializer.new(AnswerResource, 
+    fields:{
+      answers: [:user_id, :question_id, :content, :created_at, :updated_at],
+      links: [:self]
+    }).serialize_to_hash(
+      @answers.map {|a| AnswerResource.new(a, nil)}
+    )
   end
 
-  # GET /answers/1
-  def show
-    render json: @answer
-  end
-
-  # POST /answers
+  # POST /questions/:question_id/answers
   def create
-    @answer = Answer.new(answer_params)
+    @answer = @question.answers.new(answer_params)
+    @answer.user_id = current_user.id
 
     if @answer.save
-      render json: @answer, status: :created, location: @answer
+      render json: JSONAPI::ResourceSerializer.new(AnswerResource,
+      fields:{
+        answers: [:user_id, :question_id, :content, :created_at, :updated_at],
+        links: [:self]
+      }).serialize_to_hash(AnswerResource.new(@answer, nil))
     else
-      render json: @answer.errors, status: :unprocessable_entity
-    end
-  end
-
-  # PATCH/PUT /answers/1
-  def update
-    if @answer.update(answer_params)
-      render json: @answer
-    else
-      render json: @answer.errors, status: :unprocessable_entity
+      render json: {data:@answer.errors}, status: :unprocessable_entity
     end
   end
 
   # DELETE /answers/1
   def destroy
-    @answer.destroy
+    if(@question.answer_id == @answer.id)
+      render json: {data: "Answer is solution for ##{@question.id}. Cannot be deleted."}, status: :bad_request
+    else
+      @answer.destroy
+    end
   end
 
   private
@@ -46,6 +50,22 @@ class AnswersController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def answer_params
-      params.require(:answer).permit(:content, :User_id, :Question_id)
+      params.require(:answer).permit(:content)
+    end
+
+    def set_question
+      @question = Question.find(params[:question_id]) 
+      @answers = @question.answers
+    end
+    def check_if_owner
+      unless current_user.id == @answer.user_id
+        render json: {data: 'Current user must be the owner of the answer'}, status: :bad_request
+      end
+    end
+
+    def check_if_solved
+      unless !@question.status
+        render json: {data: "Question ##{@question.id} is already solved."}, status: :unprocessable_entity
+      end
     end
 end

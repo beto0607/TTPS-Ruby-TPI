@@ -56,7 +56,7 @@ class QuestionsController < ApplicationController
       render json: JSONAPI::ResourceSerializer.new(QuestionResource,
         fields:{
           questions: [:title, :user_id, :answer_count, :status, :answer_id, :description, :created_at, :updated_at],
-          links: [:self],
+          links: [:self]
         }).serialize_to_hash(QuestionResource.new(@question, nil))
     else
       render json: {data:@question.errors}, status: :unprocessable_entity
@@ -107,7 +107,7 @@ class QuestionsController < ApplicationController
     end
     def check_if_solved
       unless !@question.status
-        render json: {data: "Question ##{@question.id} is already solved."}, status: :bad_request
+        render json: {data: "Question ##{@question.id} is already solved."}, status: :unprocessable_entity
       end
     end
 end
