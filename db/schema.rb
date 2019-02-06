@@ -12,7 +12,10 @@
 
 ActiveRecord::Schema.define(version: 2019_02_02_173255) do
 
-  create_table "answers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
+  create_table "answers", force: :cascade do |t|
     t.text "content"
     t.bigint "user_id"
     t.bigint "question_id"
@@ -22,7 +25,7 @@ ActiveRecord::Schema.define(version: 2019_02_02_173255) do
     t.index ["user_id"], name: "index_answers_on_user_id"
   end
 
-  create_table "questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "questions", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.boolean "status", default: false
@@ -34,7 +37,7 @@ ActiveRecord::Schema.define(version: 2019_02_02_173255) do
     t.index ["user_id"], name: "index_questions_on_user_id"
   end
 
-  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+  create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "username"
     t.string "screen_name"

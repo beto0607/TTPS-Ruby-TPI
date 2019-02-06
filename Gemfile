@@ -50,7 +50,7 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Database MySQL
-gem 'mysql2', '~> 0.5.2'
+#gem 'mysql2', '~> 0.5.2'
 
 # For JWT
 gem 'knock'
@@ -58,3 +58,5 @@ gem 'knock'
 # For serialize objects to JSON: Active Model Serializers
 gem 'active_model_serializers', '~> 0.10.0'
 gem "jsonapi-resources", "~> 0.9.5"
+
+gem "pg", "~> 1.1"
