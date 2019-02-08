@@ -11,12 +11,16 @@ default: &default
   #host: localhost
   #host: 127.0.0.1
   #port: 5432
-  username: beto0607
-  password: asd45asd
+  # username: beto0607
+  # password: asd45asd
+  host: ec2-54-83-17-151.compute-1.amazonaws.com
+  username: sjygkroncfokyw
+  password: a4b46700915411032e6f1ea2e93b9fcbf24a12126212e26dcf8f8f3c03f1f9bc
 
 development:
   <<: *default
-  database: ruby_tpi
+  #database: ruby_tpi
+  database: d2eb2ds49vhhlo
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -27,4 +31,5 @@ test:
 
 production:
   <<: *default
-  database: ruby_tpi
+  #database: ruby_tpi
+  database: d2eb2ds49vhhlo

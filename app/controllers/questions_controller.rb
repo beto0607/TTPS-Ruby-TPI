@@ -39,7 +39,7 @@ class QuestionsController < ApplicationController
   def create
     @question = current_user.questions.new(question_params)
 
-    if @question.save
+    if @question.save 
       render json: JSONAPI::ResourceSerializer.new(QuestionResource,
         fields:{
           questions: [:title, :user_id, :answer_count, :status, :answer_id, :description, :created_at, :updated_at],
