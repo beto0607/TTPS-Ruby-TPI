@@ -41,8 +41,6 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
 
-  # For seeds
-  gem 'faker'
 end
 
 
@@ -60,3 +58,7 @@ gem 'active_model_serializers', '~> 0.10.0'
 gem "jsonapi-resources", "~> 0.9.5"
 
 gem "pg", "~> 1.1"
+
+
+# For seeds
+gem 'faker'
