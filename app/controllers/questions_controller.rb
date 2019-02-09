@@ -1,8 +1,9 @@
 class QuestionsController < ApplicationController
   before_action :set_question, only: [:show, :update, :destroy, :resolve]
   before_action :authenticate_user, only: [:create, :update, :destroy, :resolve]
+  before_action :question_params, only: [:create,:update]
   before_action :check_if_owner, only: [:update, :destroy, :resolve]
-  before_action :check_if_solved, only: [:resolve]
+  before_action :check_if_solved, only: [:update, :resolve, :destroy]
 
   # GET /questions 
   # :sort => ("needing_help" | "pending_first" | "latest") default="latest"
@@ -17,21 +18,23 @@ class QuestionsController < ApplicationController
     end
 
     render json: JSONAPI::ResourceSerializer.new(QuestionResource, 
-    fields:{
-      questions: [:title, :user_id, :answer_count, :status, :answer_id, :description_short, :created_at, :updated_at],
-      links: [:self]
-    }).serialize_to_hash(
-      questions.map {|q| QuestionResource.new(q, nil)}
-    )
+      fields:{
+        questions: [:title, :user_id, :answer_count, :status, :answer_id, :description_short, :created_at, :updated_at],
+        links: [:self]
+      }).serialize_to_hash(
+        questions.map {|q| QuestionResource.new(q, nil)}
+      )
   end
 
   # GET /questions/1
   def show
     render json: JSONAPI::ResourceSerializer.new(QuestionResource,
-      include: [params[:answers] ? 'answers' : ''],
+      include: ['answers'],
+      
       fields:{
         questions: [:title, :user_id, :answer_count, :status, :answer_id, :description, :created_at, :updated_at],
         links: [:self],
+        answers: [:user_id, :question_id, :content, :created_at, :updated_at]
       }).serialize_to_hash(QuestionResource.new(@question, nil))
   end
 
@@ -44,9 +47,9 @@ class QuestionsController < ApplicationController
         fields:{
           questions: [:title, :user_id, :answer_count, :status, :answer_id, :description, :created_at, :updated_at],
           links: [:self],
-        }).serialize_to_hash(QuestionResource.new(@question, nil))
+        }).serialize_to_hash(QuestionResource.new(@question, nil)), status: :created
     else
-      render json: {data:@question.errors}, status: :unprocessable_entity
+      render json: {error:@question.errors}, status: :unprocessable_entity
     end
   end
 
@@ -57,19 +60,20 @@ class QuestionsController < ApplicationController
         fields:{
           questions: [:title, :user_id, :answer_count, :status, :answer_id, :description, :created_at, :updated_at],
           links: [:self]
-        }).serialize_to_hash(QuestionResource.new(@question, nil))
+        }).serialize_to_hash(QuestionResource.new(@question, nil)), status: :ok
     else
-      render json: {data:@question.errors}, status: :unprocessable_entity
+      render json: {error:@question.errors}, status: :unprocessable_entity
     end
   end
 
   # DELETE /questions/1
   def destroy
     if(@question.answers.count > 0)
-      render json: {data: "Question ##{@question.id} has answers"}, status: :bad_request
+      render json: {error:{title: "Question ##{@question.id} has answers"}}, status: :unprocessable_entity
       return
     end
     @question.destroy
+    render status: :no_content
   end
 
   def resolve
@@ -80,34 +84,44 @@ class QuestionsController < ApplicationController
       render json: JSONAPI::ResourceSerializer.new(QuestionResource,
         fields:{
           questions: [:title, :user_id, :answer_count, :status, :answer_id, :description, :created_at, :updated_at],
-          links: [:self],
-        }).serialize_to_hash(QuestionResource.new(@question, nil))
+          links: [:self]
+        }).serialize_to_hash(QuestionResource.new(@question, nil)), status: :ok
     else
-      render json: {data: "Answer ##{params[:answer_id]} doesn't belong to Question ##{@question.id}."}, status: :bad_request
+      render json: {error: {title:"Answer ##{params[:answer_id]} doesn't belong to Question ##{@question.id}."}}, status: :bad_request
     end
   end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_question
       @question = Question.find(params[:id] || params[:question_id])
+    rescue ActiveRecord::RecordNotFound
+      render json: { error: {title:"Question ##{params[:id] || params[:question_id]} not found"} }, status: :not_found
     end
 
     # Only allow a trusted parameter "white list" through.
     def question_params
       params.require(:question).permit(:title, :description)
+    rescue ActionController::ParameterMissing
+      render json: {error: {title: "Params required: question{title, description, question_id}"}}, status: :bad_request
     end
+
     def check_if_owner
       unless current_user.id == @question.user_id
-        render json: {data: 'Current user must be the owner of the question'}, status: :bad_request
+        render json: {error: {title: 'Token user must be the owner of the question'}}, status: :unauthorized
       end
     end
     
     def resolve_params
       params.require(:answer_id)
+    rescue ActionController::ParameterMissing
+      render json: {error: {title: "Params required: answer_id"}}, status: :bad_request
     end
+    
     def check_if_solved
-      unless !@question.status
-        render json: {data: "Question ##{@question.id} is already solved."}, status: :unprocessable_entity
+      if @question.status
+        render json: {error: {title: "Question ##{@question.id} is already solved."}}, status: :unprocessable_entity
       end
     end
+
 end

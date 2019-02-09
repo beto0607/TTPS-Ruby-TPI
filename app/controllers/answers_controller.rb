@@ -2,6 +2,7 @@ class AnswersController < ApplicationController
   before_action :set_answer, only: [:show, :update, :destroy]
   before_action :set_question, only: [:index, :create, :destroy]
   before_action :authenticate_user, only: [:create, :destroy]
+  before_action :answer_params, only: [:create, :update]
   before_action :check_if_solved, only: [:create]
   before_action :check_if_owner, only: [:destroy]
 
@@ -27,18 +28,19 @@ class AnswersController < ApplicationController
       fields:{
         answers: [:user_id, :question_id, :content, :created_at, :updated_at],
         links: [:self]
-      }).serialize_to_hash(AnswerResource.new(@answer, nil))
+      }).serialize_to_hash(AnswerResource.new(@answer, nil)), status: :created
     else
-      render json: {data:@answer.errors}, status: :unprocessable_entity
+      render json: {error:@answer.errors}, status: :unprocessable_entity
     end
   end
 
   # DELETE /answers/1
   def destroy
     if(@question.answer_id == @answer.id)
-      render json: {data: "Answer is solution for ##{@question.id}. Cannot be deleted."}, status: :bad_request
+      render json: {error:{title: "Answer is solution for ##{@question.id}. Cannot be deleted."}}, status: :bad_request
     else
       @answer.destroy
+      render status: :no_content
     end
   end
 
@@ -46,26 +48,33 @@ class AnswersController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_answer
       @answer = Answer.find(params[:id])
+    rescue 
+      render json: { error: {title:"Answer ##{params[:id] || params[:answer_id]} not found"} }, status: :not_found
     end
 
     # Only allow a trusted parameter "white list" through.
     def answer_params
       params.require(:answer).permit(:content)
+    rescue ActionController::ParameterMissing
+      render json: {error: {title:"Params required: answer{content}"}}, status: :bad_request
     end
 
     def set_question
       @question = Question.find(params[:question_id]) 
       @answers = @question.answers
+    rescue 
+      render json: { error: {title:"Question ##{params[:question_id]} not found"}}, status: :not_found
     end
+
     def check_if_owner
       unless current_user.id == @answer.user_id
-        render json: {data: 'Current user must be the owner of the answer'}, status: :bad_request
+        render json: {error:{title: 'Current user must be the owner of the answer'}}, status: :unauthorized
       end
     end
 
     def check_if_solved
       unless !@question.status
-        render json: {data: "Question ##{@question.id} is already solved."}, status: :unprocessable_entity
+        render json: {error: {title: "Question ##{@question.id} is already solved."}}, status: :unprocessable_entity
       end
     end
 end

@@ -1,24 +1,34 @@
 # TTPS - Ruby - TPI #
 
-## Dependencies-Gems ##
-* Ruby
-* Rails
-* [Knock](https://github.com/nsarno/knock)
-* [Mysql2 - 0.5.2](https://rubygems.org/gems/mysql2/versions/0.5.2)
-* [Faker](https://rubygems.org/gems/faker)
-* [bcrypt - 3.1.12](https://rubygems.org/gems/bcrypt/versions/3.1.12)
+## Dependencies##
+* [Ruby - 2.5.3](https://www.ruby-lang.org/)
+* [Postgresql - 10.5](https://www.postgresql.org/)
+    * DBMS
 
+##Gems ##
+* [Rails - 5.2.2](https://rubygems.org/gems/rails)
+* [Knock](https://github.com/nsarno/knock)
+    * Token authentication
+* [Postgresql](https://rubygems.org/gems/pg/versions/1.1.4)
+    * DBMS gem
+* [Faker](https://rubygems.org/gems/faker)
+    * DB seed
+* [bcrypt - 3.1.12](https://rubygems.org/gems/bcrypt/versions/3.1.12)
+    * Password encripation
+* [JSONAPI::Resources - 0.9.5](https://rubygems.org/gems/jsonapi-resources/versions/0.9.5)
+    * JSONAPI responses
 
 ## Owner ##
 * Albanesi, Roberto. Legajo: 09761/0
 
 ## Endpoints ##
 
-[Endpoints file](ENDPOINTS.md)
-
+[User enpoints](USER_ENDPOINTS.md)
+[Question endpoints](QUESTION_ENDPOINTS.md)
+[Answer endpoints](ANSWER_ENDPOINTS.md)
 
 ## Usage ##
 
-1. `rails db:create`
-2. `rails db:seed`
-3. `rails s`
+1. `bundle install`
+2. `rails db:create && rails db:seed`
+4. `rails s`

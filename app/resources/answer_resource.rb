@@ -8,4 +8,9 @@ class AnswerResource < JSONAPI::Resource
             self: nil
         }
     end
+    def custom_relationships()
+        {
+            self: nil
+        }
+    end
 end
