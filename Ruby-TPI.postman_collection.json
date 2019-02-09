@@ -1,0 +1,309 @@
+{
+	"info": {
+		"_postman_id": "419a787a-04de-4cf9-bb3f-14c1e15153d4",
+		"name": "Ruby-TPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Ruby - Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"auth\":{\n\t\t\"username\":  \"UserTest\",\n\t\t\"password\":\"Test1\"\n\t}\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/sessions",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"sessions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": " {\n    \"user\": {\n        \"username\": \"anUsernaasdfme123\",\n        \"email\": \"an@emaasdfil33.com\",\n        \"password\": \"aPassword\",\n        \"password_confirmation\": \"aPassword\",\n        \"screen_name\": \"Screen Name\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/users",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete question",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-QA-Key",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDk2NjQ5NTEsInN1YiI6MX0.Ahwn57xHZ-zFGRI_gqlR8Hu8V_prgRGqUsN0A7rzXUo",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/questions/4",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						"4"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Show question",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-QA-Key",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDk2NzA5NDYsInN1YiI6MX0.nrr3Bfq6Qfp86Dt9QHtJx-3AYKmYmccc0NUpo5kI_sk",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"question\":{\n        \"description\":\"aDescription\"\n        }\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/questions/",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Resolve",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "X-QA-Key",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDk2NzIyNjksInN1YiI6MX0.bYUi7tuPLXnSZ5nYAOSqxm0exONDBxCsYOlKr8CnbdA",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\"answer_id\": 2\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/questions/2/resolve",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						"2",
+						"resolve"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create question",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-QA-Key",
+						"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NDk2NzA5NDYsInN1YiI6MX0.nrr3Bfq6Qfp86Dt9QHtJx-3AYKmYmccc0NUpo5kI_sk",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"question\":{\n        \"description\":\"\"\n        }\n}"
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/questions/",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Answers index",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/questions/1/answers",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						"1",
+						"answers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create answer",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/questions/1/answers",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						"1",
+						"answers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Question index",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://0.0.0.0:3000/questions/4",
+					"protocol": "http",
+					"host": [
+						"0",
+						"0",
+						"0",
+						"0"
+					],
+					"port": "3000",
+					"path": [
+						"questions",
+						"4"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
