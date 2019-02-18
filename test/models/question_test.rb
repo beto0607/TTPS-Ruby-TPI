@@ -21,7 +21,7 @@ class QuestionTest < ActiveSupport::TestCase
     assert_not q.valid?
   end
 
-  test "Cannot set status to true when create" do 
+  test "Status is always false when create a question" do 
     q = FactoryGirl.create(:question, status: true)
     assert_not q.status
   end
