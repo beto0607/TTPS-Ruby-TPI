@@ -62,3 +62,4 @@ gem "pg", "~> 1.1"
 
 # For seeds
 gem 'faker'
+gem "factory_girl_rails", "~> 4.9"
