@@ -12,22 +12,22 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Lack of params - Email" do
-    user = FactoryGirl.build(:user, email: "")
+    user = FactoryGirl.build(:user, email: nil)
     assert_not user.valid?
   end
 
   test "Lack of params - username" do
-    user = FactoryGirl.build(:user, username: "")
+    user = FactoryGirl.build(:user, username: nil)
     assert_not user.valid?
   end
 
   test "Lack of params - screen_name" do
-    user = FactoryGirl.build(:user, screen_name: "")
+    user = FactoryGirl.build(:user, screen_name: nil)
     assert_not user.valid?
   end
 
   test "Lack of params - password" do
-    user = FactoryGirl.build(:user, password: "", password_confirmation: "")
+    user = FactoryGirl.build(:user, password: nil, password_confirmation: nil)
     assert_not user.valid?
   end
 
@@ -37,7 +37,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   test "Cannot create duplicated" do
-    FactoryGirl.create(:user)
-    assert_not FactoryGirl.build(:user).valid?   
+    user = FactoryGirl.create(:user)
+    assert_not FactoryGirl.build(:user, username: user.username).valid?   
   end
 end

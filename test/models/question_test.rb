@@ -1,51 +1,33 @@
 require 'test_helper'
 
 class QuestionTest < ActiveSupport::TestCase
-  setup do
-    @user = User.create(
-      username: "question_owner",
-      password: "pass",
-      password_confirmation: "pass",
-      email: "email@email.com",
-      screen_name: "Question Owner"
-    )
-  end
+
   test "Create question" do
-    q = Question.create(
-      user_id: @user.id,
-      title: "Question created",
-      description: "Question test"
-    )
-    assert q.persisted?
+    assert FactoryGirl.build(:question).valid?
   end
-  test "Cannot create question without all parameters" do
-    q = Question.create(
-      user_id: @user.id,
-      description: "No title"
-    )
-    assert_not q.persisted?
-    q = Question.create(
-      user_id: @user.id,
-      title: "No description"
-    )
-    assert_not q.persisted?
-    q = Question.create(
-      description: "No user",
-      title: "No user"
-    )
-    assert_not q.persisted?
+
+  test "Lack of parameters - Title" do
+    q = FactoryGirl.build(:question, title: nil)
+    assert_not q.valid?
+  end
+
+  test "Lack of parameters - Description" do
+    q = FactoryGirl.build(:question, description: nil)
+    assert_not q.valid?
+  end
+
+  test "Lack of parameters - User" do
+    q = FactoryGirl.build(:question, user: nil)
+    assert_not q.valid?
   end
 
   test "Cannot set status to true when create" do 
-    q = Question.create(
-      user_id: @user.id,
-      title: "Status allways start with false",
-      description: "Status allways start with false",
-      status: true,
-      answer_id: 1
-    )
-    assert q.persisted?
+    q = FactoryGirl.create(:question, status: true)
     assert_not q.status
-    assert_nil q.answer_id
+  end
+
+  test "User doesn't exists" do 
+    q = FactoryGirl.build(:question, user_id: -1)
+    assert_not q.valid?
   end
 end
