@@ -22,6 +22,7 @@ FactoryGirl.define do
 #--------------ANSWERS-----------------
     factory :answer do
         content "aContent"
-        pepe02
+        question
+        user
     end
 end
