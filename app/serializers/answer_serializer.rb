@@ -3,3 +3,6 @@ class AnswerSerializer < ActiveModel::Serializer
   has_one :user
   has_one :question
 end
+
+
+require 'jsonapi-serializers'
