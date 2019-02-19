@@ -75,6 +75,8 @@ GEM
       activerecord (>= 4.1)
       concurrent-ruby
       railties (>= 4.1)
+    jsonapi-serializers (1.0.1)
+      activesupport
     jwt (1.5.6)
     knock (2.1.1)
       bcrypt (~> 3.1)
@@ -166,6 +168,7 @@ DEPENDENCIES
   factory_girl_rails (~> 4.9)
   faker
   jsonapi-resources (~> 0.9.5)
+  jsonapi-serializers (~> 1.0)
   knock
   listen (>= 3.0.5, < 3.2)
   pg (~> 1.1)

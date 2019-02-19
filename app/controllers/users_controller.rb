@@ -4,18 +4,10 @@ class UsersController < ApplicationController
   #POST /users
   def create
     @user = User.new(user_params)
-
     if @user.save
-      # render json: 
-      #   JSONAPI::ResourceSerializer.new(UserResource,
-      #     fields:{
-      #       users:[:screen_name, :email, :username],
-      #       liks:[:self]
-      #     }).serialize_to_hash(UserResource.new(@user, nil)), 
-      # status: :created
-      render_response UserResource, @user, {users:[:screen_name, :email, :username],liks:[:self]}, :created
+      render_json serialize_model(@user), :created
     else
-      render json:{errors: @user.errors}, status: :unprocessable_entity
+      render_json({:errors => @user.errors}, :unprocessable_entity)
     end
   end
 

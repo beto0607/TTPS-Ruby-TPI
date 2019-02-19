@@ -9,6 +9,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     user = FactoryGirl.attributes_for(:user)
     post users_url, params: {user: user}, as: :json
     assert_response 201
+    p response.body
   end
 
   test "should not create user - Username taken" do
@@ -21,7 +22,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   test "should not create user - Email taken" do
     user_params = FactoryGirl.attributes_for(:user)
     FactoryGirl.create(:user, email: user_params[:email])
-    post users_url, params: user_params, as: :json
+    post users_url, params: { user: user_params }, as: :json
     assert_response 422
   end
 
