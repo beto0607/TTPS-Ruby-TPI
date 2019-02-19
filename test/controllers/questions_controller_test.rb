@@ -97,11 +97,10 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "should not update question - Not found" do
-    setup_user_and_token
     patch question_url({id: -1}), 
       params: FactoryGirl.attributes_for(:question),
       as: :json, 
-      headers: { 'X-QA-Key' => @token }
+      headers: { 'X-QA-Key' => "Anything" }
     assert_response 404
   end
 
@@ -113,8 +112,8 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "should not destroy question - Without token" do
-    setup_question
-    delete question_url(@question)
+    question = FactoryGirl.create(:question)
+    delete question_url(question)
     assert_response 401
   end
   
@@ -174,10 +173,11 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
   
   test "should not resolve question - User isn't question's owner" do
     setup_answer
+    setup_user_and_token
     put question_url(@question)+'/resolve', 
       params: {answer_id: 1}, 
       as: :json, 
-      headers: { 'X-QA-Key' => "Anything" }
+      headers: { 'X-QA-Key' =>  @token}
     assert_response 401
   end
 

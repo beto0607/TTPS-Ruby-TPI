@@ -107,6 +107,7 @@ class QuestionsController < ApplicationController
     end
 
     def check_if_owner
+
       unless current_user.id == @question.user_id
         render json: {error: {title: 'Token user must be the owner of the question'}}, status: :unauthorized
       end
