@@ -1,9 +1,3 @@
-# class UserSerializer < ActiveModel::Serializer
-#   attributes :id, :email, :username, :screen_name
-# end
-
-
-
 require 'jsonapi-serializers'
 
 class UserSerializer
@@ -11,9 +5,9 @@ class UserSerializer
 
   attributes :id, :email, :username, :screen_name
 
-  
+
   def self_link
     nil
   end
-  
+
 end

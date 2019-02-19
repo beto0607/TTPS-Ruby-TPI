@@ -9,7 +9,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     user = FactoryGirl.attributes_for(:user)
     post users_url, params: {user: user}, as: :json
     assert_response 201
-    p response.body
   end
 
   test "should not create user - Username taken" do

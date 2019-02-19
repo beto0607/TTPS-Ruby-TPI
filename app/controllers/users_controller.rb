@@ -1,5 +1,4 @@
 class UsersController < ApplicationController
-  #before_action :user_params, only: [:create]
 
   #POST /users
   def create
@@ -7,7 +6,7 @@ class UsersController < ApplicationController
     if @user.save
       render_json serialize_model(@user), :created
     else
-      render_json({:errors => @user.errors}, :unprocessable_entity)
+      render_json serialize_errors(@user.errors), :unprocessable_entity
     end
   end
 

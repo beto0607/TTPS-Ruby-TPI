@@ -1,4 +1,5 @@
 class UserTokenController < Knock::AuthTokenController
+    
     # Knock::AuthTokenController wants to show :not_found when params are invalid.
     # So I add a handler and invoke :auth_params first of all.
     prepend_before_action :auth_params
@@ -12,18 +13,16 @@ class UserTokenController < Knock::AuthTokenController
 
     # Customize response
     def create
-        render json: { 
+        render json: {
             token: auth_token.token,
-            user: JSONAPI::ResourceSerializer.new(UserResource,
-                fields:{
-                    users:[:screen_name, :email, :username],
-                    liks:[:self]
-                }).serialize_to_hash(UserResource.new(entity, nil))
+            user: JSONAPI::Serializer.serialize(entity)
         }, status: :created
     end
 
     # Customize response
     def not_found
         render json: { error: {title:"User not found"} }, status: :not_found
-    end      
+    end
 end
+
+

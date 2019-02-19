@@ -21,8 +21,6 @@ class User < ApplicationRecord
         self.find_by username: username
     end
 
-
-    
     private
     def downcase_email
         self.email.downcase!
