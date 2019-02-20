@@ -21,15 +21,11 @@ class UserTokenController < Knock::AuthTokenController
         }, status: :created
     end
 
-    # Customize response
-    def deny_access
-        p "adf"
-        render json: { error: {title:"User not found"} }, status: :not_found
-    end
-
-    def unauthorized_entity(entity_name)
-        p "adf"
-        render json: { error: {title:"User not found"} }, status: :not_found
+    
+    rescue_from Knock.not_found_exception_class_name, with: :user_not_found
+    
+    def user_not_found
+      render json: JSONAPI::Serializer.serialize_errors("User must be authenticated."), status: :unauthorized
     end
 end
 
