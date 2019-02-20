@@ -6,24 +6,22 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     setup_latest_questions
     get questions_url, as: :json
     assert_response :ok
-    assert_equal "#{@q2}", response.parsed_body["data"][0]["id"]
-    assert_equal "#{@q1}", response.parsed_body["data"][1]["id"]
+    assert response.parsed_body["data"][0]["attributes"]["created-at"] > response.parsed_body["data"][1]["attributes"]["created-at"] 
   end
 
   test "should get index - order by needing_help" do
     setup_pending_first_and_needing_help_questions
     get questions_url+"?sort=needing_help", as: :json
     assert_response :ok
-    assert_equal "#{@q2}", response.parsed_body["data"][0]["id"]
-    assert_not response.parsed_body["data"][1]
+    assert_equal 1, response.parsed_body["data"].size
   end
 
   test "should get index - order by pending_first" do
     setup_pending_first_and_needing_help_questions
     get questions_url+"?sort=pending_first", as: :json
     assert_response :ok
-    assert_equal "#{@q2}", response.parsed_body["data"][0]["id"]
-    assert_equal "#{@q1}", response.parsed_body["data"][1]["id"]
+    assert_not response.parsed_body["data"][0]["attributes"]["status"]
+    assert response.parsed_body["data"][1]["attributes"]["status"]
   end
 
   # CREATE
@@ -236,13 +234,12 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
       @answer = FactoryGirl.create(:answer, question_id: @question.id)
     end
     def setup_latest_questions
-      @q1 = FactoryGirl.create(:question).id
-      @q2 = FactoryGirl.create(:question).id
+      FactoryGirl.create(:question)
+      FactoryGirl.create(:question)
     end
     def setup_pending_first_and_needing_help_questions
       q = FactoryGirl.create(:question)
       q.update(status:true)
-      @q1 = q.id
-      @q2 = FactoryGirl.create(:question).id
+      FactoryGirl.create(:question)
     end
 end
