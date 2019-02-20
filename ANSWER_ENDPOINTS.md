@@ -101,7 +101,9 @@
     * **Response - No token**
         * **HTTP code:** 401 - Unauthorized
         ```
-        Empty
+        {
+            "errors": "User must be authenticated."
+        }
         ```
 * `DELETE /questions/:question_id/answers/:answer_id`
     * **Request:**
@@ -148,5 +150,7 @@
     * **Response - No token**
         * **HTTP code:** 401 - Unauthorized
         ```
-        Empty
+        {
+            "errors": "User must be authenticated."
+        }
         ```             

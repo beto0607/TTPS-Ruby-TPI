@@ -163,7 +163,9 @@
     * **Response - With error - No user**
         * **HTTP code:** 401 - Unauthorized
         ```
-        Empty
+        {
+            "errors": "User must be authenticated."
+        }
         ```
 
 * `PUT/PATCH /questions/:question_id`
@@ -225,7 +227,9 @@
     * **Response - With error - No user or user isn't the owner**
         * **HTTP code:** 401 - Unauthorized
         ```
-        Empty
+        {
+            "errors": "User must be authenticated."
+        }
         ```
 * `DELETE /questions/:quesion_id`
     * **Request**
@@ -259,7 +263,9 @@
     * **Response - With error - No user or user isn't the owner**
         * **HTTP code:** 401 - Unauthorized
         ```
-        Empty
+        {
+            "errors": "User must be authenticated."
+        }
         ```
 * `PUT /questions/:quesion_id/resolve`
     * **Request**
@@ -326,5 +332,7 @@
     * **Response - With error - No user or user isn't the owner**
         * **HTTP code:** 401 - Unauthorized
         ```
-        Empty
+        {
+            "errors": "User must be authenticated."
+        }
         ```
