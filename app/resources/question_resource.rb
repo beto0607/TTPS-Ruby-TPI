@@ -3,11 +3,4 @@ class QuestionResource < JSONAPI::Resource
     has_one :user
     has_one :answer
     has_many :answers
-
-    def description_short
-        @model.description[0, 120] + (@model.description.length > 120 ? "..." : "")
-    end
-    def answer_count
-        @model.answers.count
-    end
 end
