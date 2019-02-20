@@ -17,4 +17,8 @@ class QuestionSerializer < BaseSerializer
   attribute :answers_counter do
     object.answers_counter
   end
+
+  attribute :answer_id do
+    object.answer_id
+  end
 end
