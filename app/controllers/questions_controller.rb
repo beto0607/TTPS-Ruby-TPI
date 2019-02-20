@@ -22,7 +22,7 @@ class QuestionsController < ApplicationController
   # GET /questions/1
   def show
     if(params["answers"])then
-      render_json serialize_model(@question, include: 'answers', fields: { answers: 'content,id'}), :ok
+      render_json serialize_model(@question, include: 'answers', fields: {questions:  show_fields+',answers', answers: 'content,id'}), :ok
     else
       render_unique_question :ok
     end
