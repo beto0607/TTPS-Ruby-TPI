@@ -6,25 +6,56 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-DatabaseCleaner.clean_with(:truncation)
+testUser = User.new
+testUser.username = "UserTest"
+testUser.email = Faker::Internet.email
+testUser.screen_name = Faker::Artist.name
+testUser.password = testUser.password_confirmation = "Test1"
+testUser.save
+
+user1 = User.new
+user1.username = Faker::Internet.username
+user1.email = Faker::Internet.email
+user1.screen_name = Faker::Artist.name
+user1.password = user1.password_confirmation = "Test1"
+user1.save
+
+user2 = User.new
+user2.username = Faker::Internet.username
+user2.email = Faker::Internet.email
+user2.screen_name = Faker::Artist.name
+user2.password = user2.password_confirmation = "Test2"
+user2.save
 
 
-u = User.create(username: 'test', password: Digest::SHA1.hexdigest("test"), screen_name: "test user", email: "test@test.com")
-u.save
 
-u_q = User.create(username: 'test_question', password: Digest::SHA1.hexdigest("test_question"), screen_name: "test question user", email: "test@question.com")
-u_q.save
+q1 = Question.new
+q1.title = Faker::Book.title
+q1.description = Faker::Lorem.paragraph(2)
+q1.status = false
+q1.user_id = user1.id
+q1.save
 
-u_a = User.create(username: 'test_answer', password: Digest::SHA1.hexdigest("test_answer"), screen_name: "test answer user", email: "test@answer.com")
-u_a.save
+a1 = Answer.new
+a1.content = Faker::Lorem.paragraph(1)
+a1.user_id = user2.id
+a1.question_id = q1.id
+a1.save
 
 
-(u_q.questions.create(title: "Pregunta 1", description: "Descripción de la pregunta 1")).save
+q2 = Question.new
+q2.title = Faker::Book.title
+q2.description = Faker::Lorem.paragraph(2)
+q2.status = false
+q2.user_id = user2.id
+q2.save
 
+a2 = Answer.new
+a2.content = Faker::Lorem.paragraph(1)
+a2.user_id = user1.id
+a2.question_id = q2.id
+a2.save
 
-(u_q.questions.create(title: "Pregunta 3", description: "Descripción de la pregunta 3")).save
-
-
-u_a.answers.create(question_id: 1, content: "Respuesta 1").save
-
-(u_q.questions.create(title: "Pregunta 2", description: "Descripción de la pregunta 2", status: true, answer_id: 1)).save
+q2.answer_id = a2.id
+q2.status = true
+q2.save

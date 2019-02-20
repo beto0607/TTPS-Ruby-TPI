@@ -1,43 +1,34 @@
-## TTPS - Ruby - 2018 - TPI ##
+# TTPS - Ruby - TPI #
 
-### Description ###
+## Dependencies##
+* [Ruby - 2.5.3](https://www.ruby-lang.org/)
+* [Postgresql - 10.5](https://www.postgresql.org/)
+    * DBMS
 
-Solution implemented for [this assignment](https://github.com/TTPS-ruby/practicas-ruby-ttps/blob/master/evaluaciones/2018/tpi/enunciado.md).
+##Gems ##
+* [Rails - 5.2.2](https://rubygems.org/gems/rails)
+* [Knock](https://github.com/nsarno/knock)
+    * Token authentication
+* [Postgresql](https://rubygems.org/gems/pg/versions/1.1.4)
+    * DBMS gem
+* [Faker](https://rubygems.org/gems/faker)
+    * DB seed
+* [bcrypt - 3.1.12](https://rubygems.org/gems/bcrypt/versions/3.1.12)
+    * Password encripation
+* [JSONAPI::Resources - 0.9.5](https://rubygems.org/gems/jsonapi-resources/versions/0.9.5)
+    * JSONAPI responses
 
+## Owner ##
+* Albanesi, Roberto. Legajo: 09761/0
 
-### How to use ###
+## Endpoints ##
 
-* Run `bundle install`
-* Run `rails db:seed`
-* Run `bundle exec rails s`
+[User enpoints](USER_ENDPOINTS.md)
+[Question endpoints](QUESTION_ENDPOINTS.md)
+[Answer endpoints](ANSWER_ENDPOINTS.md)
 
+## Usage ##
 
-### Endpoints ###
-
-#### Users ####
-* POST -> /users -> params: username, password, email, screen_name
-* POST -> /sessions -> params: username, password
-
-#### Questions ####
-* GET -> /questions -> params: sort(optional)(needing_help|pending_first|latest), offset(for pagination)
-* GET -> /questions/:id -> params: id
-* POST -> /questions -> params: title, description. Token in header
-* PUT -> /questions/:id -> params: id, title(optional), description(optional). Token in header
-* DELETE -> /questions/:id -> params: id. Token in header
-* PUT -> /questions/:id/resolve -> params: id, answer_id. Token in header
-
-#### Answers ####
-* GET -> /questions/:question_id/answers -> params: question_id
-* POST -> /questions/:question_id/answers -> params: question_id, content. Token in header
-* DELETE -> /questions/:question_id/answers/:id -> params: question_id, id. Token in header.
-
-
-### Tests ###
-
-### Owner ###
-* Albanesi, Roberto. 09761/0
-
-### Dependencies ###pa
-* Ruby 2.5
-* Rails 5.2
-* Database_cleanner
+1. `bundle install`
+2. `rails db:create && rails db:seed`
+4. `rails s`

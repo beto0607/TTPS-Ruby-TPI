@@ -1,180 +1,121 @@
 class QuestionsController < ApplicationController
+  before_action :set_question, only: [:show, :update, :destroy, :resolve]
+  before_action :authenticate_user, only: [:create, :update, :destroy, :resolve]
+  before_action :check_if_owner, only: [:update, :destroy, :resolve]
+  before_action :check_if_solved, only: [:update, :resolve, :destroy]
 
-    def index
-        begin 
-            questions_length = Question.count
-            if(params[:sort] == "needing_help")then
-                questions = Question.where(status: false).limit(Question.pageSize).offset(params[:offset] || 0)
-                questions_length = Question.where(status: false).count
-                #seems like sort! doesn't applies
-                questions = questions.sort do |a,b|
-                    a.answers.count  <=> b.answers.count
-                end
-            else
-                questions = Question.limit(Question.pageSize).offset(params[:offset] || 0)
-                    .order((params[:sort] == "pending_first" ? 'status ASC,':'')+'created_at DESC')
-            end
-            json_questions = questions.map do |q|
-                {
-                    id: q.id,
-                    type: "question",
-                    attributes:{
-                        title: q.title,
-                        description: q.description[0, 120] + (q.description.length > 120 ? "..." : ""),
-                        answers_count: q.answers.count,
-                        solved: q.status
-                    },
-                    links:{
-                        self: request.base_url+"/questions/#{q.id}"
-                    }
-                }
-            end
+  # GET /questions 
+  # :sort => ("needing_help" | "pending_first" | "latest") default="latest"
+  def index
+    # I used an if statement because I don't know what value can come in
+    # prams[:sort]. 
+    if(params[:sort] == "needing_help")then
+      questions = Question.needing_help.questionsLimit
+    elsif(params[:sort] == "pending_first")then
+      questions = Question.pending_first.questionsLimit
+    else
+      questions = Question.latest.questionsLimit
+    end
+    render_json serialize_models(questions, fields: {questions:index_fields}), :ok
+  end
 
-            links = {self: request.original_url}
-            links[:next] = request.base_url+"/questions?offset=#{Integer(params[:offset] || 0).succ}" unless questions_length <= (Integer(params[:offset] || 0).succ) * Question.pageSize
-            links[:previous] = request.base_url+"/questions?offset=#{Integer(params[:offset] || 0).pred}" unless Integer(params[:offset] || 0).pred < 0
+  # GET /questions/1
+  def show
+    if(params["answers"])then
+      render_json serialize_model(@question, include: 'answers', fields: { answers: 'content,id'}), :ok
+    else
+      render_unique_question :ok
+    end
+  end
 
-            render json: {
-                links: links,
-                data: json_questions
-            }, status: :ok
-        rescue
-            renderError $!.message, 500
-        end
+  # POST /questions
+  def create
+    if(question_params)then
+      @question = current_user.questions.new(question_params)
+      if @question.save 
+        render_unique_question :created
+      else
+        render_json serialize_errors(@question.errors), :unprocessable_entity
+      end
+    end
+  end
+
+  # PATCH/PUT /questions/1
+  def update
+    if(question_params)then
+      if @question.update(question_params)
+        render_unique_question :ok
+      else
+        render_json serialize_errors(@question.errors), :unprocessable_entity
+      end
+    end
+  end
+
+  # DELETE /questions/1
+  def destroy
+    if(@question.answers.count > 0)
+      render_json serialize_errors("Question ##{@question.id} has answers"), :unprocessable_entity
+      return
+    end
+    @question.destroy
+    render status: :no_content
+  end
+
+  def resolve
+    if(resolve_params)then
+      a = @question.answers.find_by(id: resolve_params)
+      if(a)
+        # NoMethodError -> 'destroyed?'
+        @question = Question.update(@question.id, status:true, answer_id:a.id)
+        render_unique_question :ok
+      else
+        render json: {error: {title:"Answer ##{params[:answer_id]} doesn't belong to Question ##{@question.id}."}}, status: :bad_request
+      end
+    end
+  end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_question
+      @question = Question.find(params[:id] || params[:question_id])
+    rescue ActiveRecord::RecordNotFound
+      render_json serialize_errors("Question ##{params[:id] || params[:question_id]} not found"), :not_found
     end
 
-    def show id=nil
-        begin
-            question = Question.find_by!(id: (id || params[:id]))
-            
-            response = {
-                links: {self: request.original_url},
-                data: {
-                    type: "question",
-                    id: question.id,
-                    attributes: {
-                        title: question.title,
-                        description: question.description,
-                        status: question.status,
-                        created_at: question.created_at,
-                        updated_at: question.updated_at
-                    },
-                    relationships:{
-                        author:{
-                            id: question.user_id,
-                            attributes:{
-                                screen_name: question.user.screen_name
-                            }
-                        }
-                    }
-                },
-            }
-            response[:data][:relationships][:solved_answer] = {
-                type: "answer",
-                id: question.answer_id,
-                links: {
-                    self: request.base_url+"/questions/#{question.answer_id}"
-                }
-            } unless question.answer_id == nil
-
-            if(params[:answers])then
-                response[:answers] = AnswersController.new.index question.id, request
-            end
-
-            if(id == nil)then
-                render json: response.to_json, status: :ok
-            else
-                response.to_json
-            end
-        rescue ActiveRecord::RecordNotFound
-            renderError $!.message, 404
-        rescue
-            renderError $!.message, 500
-        end
+    # Only allow a trusted parameter "white list" through.
+    def question_params
+      params.require(:question).permit(:title, :description) 
     end
 
-    def new
-        begin
-            checkContentType
-            logged_user = getUserByToken
-            question = logged_user.questions.create!(
-                title: params[:title],
-                description: params[:description],
-                status: false
-            )
-            render json: show(question.id), status: :created
-        rescue ActiveRecord::RecordNotFound
-            renderError $!.message, 404
-        rescue ActiveRecord::RecordInvalid
-            renderError $!.message, 400
-        rescue TokenDoesntExist, MimeTypeError
-            renderError $!.message, $!.httpResponse
-        rescue
-            renderError $!.message, 500
-        end
+    def check_if_owner
+      unless current_user.id == @question.user_id
+        render_json serialize_errors('Token user must be the owner of the question'), :unauthorized
+      end
+    end
+    
+    def resolve_params
+      params.require(:answer_id)
+    end
+    
+    def check_if_solved
+      if @question.status
+        render json: {error: {title: "Question ##{@question.id} is already solved."}}, status: :unprocessable_entity
+      end
     end
 
-    def edit
-        begin
-            checkContentType
-            logged_user = getUserByToken
-            question = Question.find_by!(id: params[:id])
-            if(logged_user.id != question.user_id)then raise OwnerError end
-            question.update!(
-                title: params[:title] || question[:title],
-                description: params[:description] || question[:description]
-            )
-            render json: show(question.id), status: :ok
-        rescue ActiveRecord::RecordNotFound
-            renderError $!.message, 404
-        rescue ActiveRecord::RecordInvalid
-            renderError $!.message, 400
-        rescue OwnerError, TokenDoesntExist, MimeTypeError
-            renderError $!.message, $!.httpResponse
-        rescue
-            renderError $!.message, 500
-        end
+    def index_fields
+      #avoid render full description on index
+      'id,title,description-short,status,answer-id,answers-counter,created-at,updated-at'
     end
 
-    def destroy
-        begin
-            logged_user = getUserByToken
-            question = Question.find_by!(id: params[:id])
-            if(logged_user.id != question.user_id)then raise OwnerError end
-            question.destroy!
-            render json: {}, status: :no_content
-        rescue ActiveRecord::RecordNotDestroyed
-            renderError $!.message, 409
-        rescue ActiveRecord::RecordNotFound
-            renderError $!.message, 404
-        rescue ActiveRecord::RecordInvalid
-            renderError $!.message, 400
-        rescue OwnerError, TokenDoesntExist
-            renderError $!.message, $!.httpResponse
-        rescue ActiveRecord::DeleteRestrictionError
-            renderError "Question has answers", 400
-        rescue
-            renderError $!.message, 500
-        end
+    def show_fields
+      #avoid render description-short on show, create, update, resolve
+      'id,title,description,status,answer-id,answers-counter,created-at,updated-at'
     end
 
-    def update
-        begin
-            checkContentType
-            logged_user = getUserByToken
-            question = Question.find_by!(id: params[:id])
-            if(logged_user.id != question.user_id)then raise OwnerError end
-
-            if(!question.answers.find_by(id: params[:answer_id]))then raise AnswerFromOtherQuestionError end
-
-            question.update!(status: true, answer_id: params[:answer_id])
-            render json: show(question.id), status: :no_content
-        rescue ActiveRecord::RecordNotFound
-            renderError $!.message, 404
-        rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError, MimeTypeError
-            renderError $!.message, $!.httpResponse
-        rescue
-            renderError $!.message, 500
-        end
+    def render_unique_question status=:ok
+      render_json serialize_model(@question, fields:{
+        questions: show_fields
+      }), status
     end
 end

@@ -1,24 +1,27 @@
 class User < ApplicationRecord
+    has_secure_password
+
     has_many :questions
 
     has_many :answers
 
-    has_many :tokens
-
+    validates :questions, presence: false
+    validates :answers, presence: false
     validates :username, uniqueness: true, presence: true
-    validates :email, uniqueness: true, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP } 
-    validates :password, presence: true
+    validates :email, uniqueness: { case_sensitive: false }, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP } 
+    validates :password_digest, presence: true
     validates :screen_name, presence: true
 
-    def self.userAttributes u
-        {
-            username: u.username,
-            email: u.email,
-            screen_name: u.screen_name
-        }
-    end
+    before_save :downcase_email
 
-    def self.encryptedPassword plain_password
-        Digest::SHA1.hexdigest(plain_password)
+
+
+    def self.from_token_request request
+        username = request.params["auth"] && request.params["auth"]["username"]
+        self.find_by username: username
+    end
+    private
+    def downcase_email
+        self.email.downcase!
     end
 end

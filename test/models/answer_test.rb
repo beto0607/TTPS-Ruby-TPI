@@ -1,7 +1,23 @@
 require 'test_helper'
 
 class AnswerTest < ActiveSupport::TestCase
-  test "Cannot be created without content" do
-    assert_not Answer.create(user_id: 1, question_id: 1).valid?
+
+  test "Create answer" do
+    assert FactoryGirl.build(:answer).valid?
+  end
+
+  test "Lack of parameters - Content" do
+    answer = FactoryGirl.build(:answer, content: nil)
+    assert_not answer.valid?
+  end
+  
+  test "Lack of parameters - User" do
+    answer = FactoryGirl.build(:answer, user: nil)
+    assert_not answer.valid?
+  end
+  
+  test "Lack of parameters - Question" do
+    answer = FactoryGirl.build(:answer, question: nil)
+    assert_not answer.valid?
   end
 end

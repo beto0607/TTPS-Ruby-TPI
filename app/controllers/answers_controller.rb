@@ -1,100 +1,74 @@
 class AnswersController < ApplicationController
+  before_action :set_answer, only: [:show, :update, :destroy]
+  before_action :set_question, only: [:index, :create, :destroy]
+  before_action :authenticate_user, only: [:create, :destroy]
+  before_action :check_if_solved, only: [:create]
+  before_action :check_if_owner, only: [:destroy]
 
-    def index id=nil, req=nil
-        begin
-            answers = Question.find_by!(id: (id || params[:question_id])).answers.map do |a|
-                {
-                    type: 'answer',
-                    id: a.id,
-                    attributes: {
-                        content: a.content,
-                        created_at: a.created_at,
-                        updated_at: a.updated_at
-                    },
-                    relationships: {
-                        author: {
-                            id: a.user_id
-                        },
-                        question:{
-                            id: a.question_id,
-                            links:{
-                                self: (request || req).base_url+"/questions/#{a.question_id}"
-                            }
-                        }
-                    }
-                }
-            end
-            response = {
-                links:{
-                    self: (request || req).base_url+"/questions/#{(id || params[:question_id])}/answers"
-                },
-                data: answers
-            }
 
-            if (id)then
-                response
-            else
-                render json: response, status: 200
-            end
-        rescue ActiveRecord::RecordNotFound
-            renderError $!.message, 404
-        rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError
-            renderError $!.message, $!.httpResponse
-        rescue
-            renderError $!.message, 500
-        end
+  # GET /questions/:question_id/answers
+  def index
+    render_json serialize_models(@answers), :ok
+  end
+
+  # POST /questions/:question_id/answers
+  def create
+    if(answer_params)then
+      @answer = @question.answers.new(answer_params)
+      @answer.user_id = current_user.id
+
+      if @answer.save
+        render_unique_question :created
+      else
+        render_json serialize_errors(@answer.errors), :unprocessable_entity
+      end
+    end
+  end
+
+  # DELETE /answers/1
+  def destroy
+    if(@question.answer_id == @answer.id)
+      render_json serialize_errors("Answer is solution for ##{@question.id}. Cannot be deleted."), :bad_request
+    else
+      @answer.destroy
+      render status: :no_content
+    end
+  end
+
+  private
+    # Use callbacks to share common setup or constraints between actions.
+    def set_answer
+      @answer = Answer.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render_json serialize_errors("Answer ##{params[:id] || params[:answer_id]} not found."), :not_found
     end
 
-    def new
-        begin
-            checkContentType
-            logged_user = getUserByToken
-            a = Question.find_by!(id: params[:question_id])
-                .answers.create!(content: params[:content], user_id: logged_user.id)
-            render json: {
-                data: {
-                    type: 'answer',
-                    id: a.id,
-                    attributes: {
-                        content: a.content,
-                        created_at: a.created_at,
-                        updated_at: a.updated_at
-                    },
-                    relationships: {
-                        author: {
-                            id: a.user_id
-                        },
-                        question:{
-                            id: a.question_id,
-                            links:{
-                                self: (request || req).base_url+"/questions/#{a.question_id}"
-                            }
-                        }
-                    }
-                }
-            }, status: 200
-        rescue ActiveRecord::RecordNotFound
-            renderError $!.message, 404
-        rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError, QuestionSolved, MimeTypeError
-            renderError $!.message, $!.httpResponse
-        rescue
-            renderError $!.message, 500
-        end
+    # Only allow a trusted parameter "white list" through.
+    def answer_params
+      params.require(:answer).permit(:content)
     end
 
-    def delete
-        begin
-            logged_user = getUserByToken
-            Question.find_by!(id: params[:question_id])
-                .answers.destroy!(content: params[:content], user_id: logged_user.id)
-        rescue ActiveRecord::RecordNotFound
-            renderError $!.message, 404
-        rescue ActiveRecord::RecordNotDestroyed
-            renderError $!.message, 409
-        rescue OwnerError, TokenDoesntExist, AnswerFromOtherQuestionError, AnswerSolution
-            renderError $!.message, $!.httpResponse
-        rescue
-            renderError $!.message, 500
-        end 
+    def set_question
+      @question = Question.find(params[:question_id]) 
+      @answers = @question.answers
+    rescue ActiveRecord::RecordNotFound
+      render_json serialize_errors("Question ##{params[:question_id]} not found."), :not_found
+    end
+
+    def check_if_owner
+      unless current_user.id == @answer.user_id
+        render_json serialize_errors('Current user must be the owner of the answer.'), :unauthorized
+      end
+    end
+
+    def check_if_solved
+      unless !@question.status
+        render_json serialize_errors("Question ##{@question.id} is already solved."), :unprocessable_entity
+      end
+    end
+
+
+    def render_unique_question status=:ok
+      render_json serialize_model(@answer), status
     end
 end

@@ -10,12 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_17_132304) do
+ActiveRecord::Schema.define(version: 2019_02_02_173255) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "answers", force: :cascade do |t|
-    t.integer "question_id"
     t.text "content"
-    t.integer "user_id"
+    t.bigint "user_id"
+    t.bigint "question_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["question_id"], name: "index_answers_on_question_id"
@@ -26,28 +29,26 @@ ActiveRecord::Schema.define(version: 2018_12_17_132304) do
     t.string "title"
     t.text "description"
     t.boolean "status", default: false
-    t.integer "user_id"
-    t.integer "answer_id"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "answer_id"
+    t.integer "answers_counter", default: 0
     t.index ["answer_id"], name: "index_questions_on_answer_id"
     t.index ["user_id"], name: "index_questions_on_user_id"
   end
 
-  create_table "tokens", force: :cascade do |t|
-    t.string "token"
-    t.datetime "expire_at"
-    t.integer "user_id"
-    t.index ["user_id"], name: "index_tokens_on_user_id"
-  end
-
   create_table "users", force: :cascade do |t|
-    t.string "username"
-    t.string "password"
-    t.string "screen_name"
     t.string "email"
+    t.string "username"
+    t.string "screen_name"
+    t.string "password_digest"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "answers", "questions"
+  add_foreign_key "answers", "users"
+  add_foreign_key "questions", "answers"
+  add_foreign_key "questions", "users"
 end
