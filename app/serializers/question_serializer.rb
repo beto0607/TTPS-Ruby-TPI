@@ -1,17 +1,17 @@
-# class QuestionSerializer < ActiveModel::Serializer
-#   attributes :id, :title, :description, :status
-#   has_one :user
-# end
 
+class QuestionSerializer < BaseSerializer
+  attributes :id, :title, :description, :status, :created_at, :updated_at, :answers_counter
 
-require 'jsonapi-serializers'
+  has_one :user, include_links: false 
 
-class QuestionSerializer
-  include JSONAPI::Serializer
-  
-  attributes :id, :title, :description, :status
+  has_one :answer do 
+    Answer.find(object.answer_id) unless !object.answer_id
+  end
 
-  has_one :user do
-    object.user
+  has_many :answers do
+    object.answers
+  end
+  attribute :description_short do
+    object.description[0, 120] + (object.description.length > 120 ? "..." : "")
   end
 end

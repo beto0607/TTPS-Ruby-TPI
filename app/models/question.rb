@@ -11,9 +11,11 @@ class Question < ApplicationRecord
   before_create :set_status_to_false
 
 
-  def self.pageSize
-    50
-  end
+  scope :needing_help,  -> { where(status: false).order("answers_counter DESC, created_at DESC") }
+  scope :pending_first, -> { order('status ASC, created_at DESC') }
+  scope :latest,        -> { order('created_at DESC') }
+  scope :questionsLimit,         -> { limit(50) }
+
   private
   def set_status_to_false
     self.status = false

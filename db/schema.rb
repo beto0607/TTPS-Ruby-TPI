@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 2019_02_02_173255) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "answer_id"
+    t.integer "answers_counter", default: 0
     t.index ["answer_id"], name: "index_questions_on_answer_id"
     t.index ["user_id"], name: "index_questions_on_user_id"
   end
