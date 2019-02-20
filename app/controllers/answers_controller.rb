@@ -6,26 +6,26 @@ class AnswersController < ApplicationController
   before_action :check_if_owner, only: [:destroy]
 
 
-  # GET /questions/:question_id/answers
+  # GET /questions/1/answers
   def index
     render_json serialize_models(@answers), :ok
   end
 
-  # POST /questions/:question_id/answers
+  # POST /questions/1/answers
   def create
     if(answer_params)then
       @answer = @question.answers.new(answer_params)
       @answer.user_id = current_user.id
 
       if @answer.save
-        render_unique_question :created
+        render_json serialize_model(@answer), :created
       else
         render_json serialize_errors(@answer.errors), :unprocessable_entity
       end
     end
   end
 
-  # DELETE /answers/1
+  # DELETE /question/1/answers/1
   def destroy
     if(@question.answer_id == @answer.id)
       render_json serialize_errors("Answer is solution for ##{@question.id}. Cannot be deleted."), :bad_request
@@ -36,14 +36,12 @@ class AnswersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_answer
       @answer = Answer.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       render_json serialize_errors("Answer ##{params[:id] || params[:answer_id]} not found."), :not_found
     end
 
-    # Only allow a trusted parameter "white list" through.
     def answer_params
       params.require(:answer).permit(:content)
     end
@@ -65,10 +63,5 @@ class AnswersController < ApplicationController
       unless !@question.status
         render_json serialize_errors("Question ##{@question.id} is already solved."), :unprocessable_entity
       end
-    end
-
-
-    def render_unique_question status=:ok
-      render_json serialize_model(@answer), status
     end
 end

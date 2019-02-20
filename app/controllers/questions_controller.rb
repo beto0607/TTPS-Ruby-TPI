@@ -75,14 +75,12 @@ class QuestionsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_question
       @question = Question.find(params[:id] || params[:question_id])
     rescue ActiveRecord::RecordNotFound
       render_json serialize_errors("Question ##{params[:id] || params[:question_id]} not found"), :not_found
     end
 
-    # Only allow a trusted parameter "white list" through.
     def question_params
       params.require(:question).permit(:title, :description) 
     end
