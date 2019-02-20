@@ -25,7 +25,7 @@ class UserTokenController < Knock::AuthTokenController
     rescue_from Knock.not_found_exception_class_name, with: :user_not_found
     
     def user_not_found
-      render json: JSONAPI::Serializer.serialize_errors("User must be authenticated."), status: :unauthorized
+      render json: JSONAPI::Serializer.serialize_errors("User not found."), status: :not_found
     end
 end
 
