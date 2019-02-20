@@ -4,6 +4,8 @@ class UserTokenController < Knock::AuthTokenController
     # So I add a handler and invoke :auth_params first of all.
     prepend_before_action :auth_params
     skip_before_action :verify_authenticity_token
+    
+
 
     def auth_params
         params.require(:auth).permit(:username, :password)
@@ -20,7 +22,13 @@ class UserTokenController < Knock::AuthTokenController
     end
 
     # Customize response
-    def not_found
+    def deny_access
+        p "adf"
+        render json: { error: {title:"User not found"} }, status: :not_found
+    end
+
+    def unauthorized_entity(entity_name)
+        p "adf"
         render json: { error: {title:"User not found"} }, status: :not_found
     end
 end

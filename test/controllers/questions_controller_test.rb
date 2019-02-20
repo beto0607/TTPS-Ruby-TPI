@@ -35,7 +35,8 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
   end
   
   test "should not create question - Without token" do
-    post questions_url, params: FactoryGirl.attributes_for(:question), as: :json
+    post questions_url, params: FactoryGirl.attributes_for(:question), as: :json,
+    headers: { 'X-QA-Key' => "@token" }
     assert_response 401
   end
   

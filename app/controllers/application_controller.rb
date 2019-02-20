@@ -33,4 +33,7 @@ class ApplicationController < ActionController::API
         JSONAPI::Serializer.serialize_errors(errors)
     end
 
+    def unauthorized_entity(entity_name)
+        render_json serialize_errors("User must be authenticated."), :unauthorized
+    end
 end

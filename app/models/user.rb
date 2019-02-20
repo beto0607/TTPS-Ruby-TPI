@@ -20,7 +20,6 @@ class User < ApplicationRecord
         username = request.params["auth"] && request.params["auth"]["username"]
         self.find_by username: username
     end
-
     private
     def downcase_email
         self.email.downcase!
