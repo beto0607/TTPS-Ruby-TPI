@@ -1,6 +1,6 @@
 
 class QuestionSerializer < BaseSerializer
-  attributes :id, :title, :description, :status, :created_at, :updated_at, :answers_counter
+  attributes :id, :title, :description, :status, :created_at, :updated_at
 
   has_one :user, include_links: false 
 
@@ -13,5 +13,8 @@ class QuestionSerializer < BaseSerializer
   end
   attribute :description_short do
     object.description[0, 120] + (object.description.length > 120 ? "..." : "")
+  end
+  attribute :answers_counter do
+    object.answers_counter
   end
 end
