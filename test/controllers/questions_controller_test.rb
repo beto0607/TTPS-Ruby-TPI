@@ -13,7 +13,7 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     setup_pending_first_and_needing_help_questions
     get questions_url+"?sort=needing_help", as: :json
     assert_response :ok
-    assert_equal 1, response.parsed_body["data"].size
+    assert_equal Question.where(status:false).size, response.parsed_body["data"].size
   end
 
   test "should get index - order by pending_first" do
@@ -21,7 +21,7 @@ class QuestionsControllerTest < ActionDispatch::IntegrationTest
     get questions_url+"?sort=pending_first", as: :json
     assert_response :ok
     assert_not response.parsed_body["data"][0]["attributes"]["status"]
-    assert response.parsed_body["data"][1]["attributes"]["status"]
+    assert response.parsed_body["data"].last["attributes"]["status"]
   end
 
   # CREATE
